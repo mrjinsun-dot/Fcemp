@@ -21,7 +21,7 @@
           <i class="fa-solid fa-store text-2xl"></i>
         </div>
         <h1 class="text-2xl font-black text-slate-900 tracking-tight">SHOWROOM PRO</h1>
-        <p class="text-xs text-slate-500 font-medium mt-0.5">मल्टी-ब्रांच, मास्टर रिपोर्ट व बैच एंट्री</p>
+        <p class="text-xs text-slate-500 font-medium mt-0.5">हाजिरी अप्रूवल, ऑटो चेक-आउट व बिलिंग</p>
       </div>
 
       <div class="flex p-1 bg-slate-100 rounded-xl mb-5">
@@ -101,7 +101,6 @@
     <!-- ==================== 3. ADMIN SETTINGS SIDE-PANEL ==================== -->
     <div id="dotMenuModal" style="display: none;" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex justify-end" onclick="closeDotMenuOnBackdrop(event)">
       <div class="bg-white w-5/6 max-w-xs h-full shadow-2xl p-5 overflow-y-auto space-y-4" onclick="event.stopPropagation()">
-        
         <div class="flex justify-between items-center pb-3 border-b border-slate-100">
           <h3 class="font-black text-slate-900 text-sm flex items-center gap-2">
             <i class="fa-solid fa-gear text-blue-900"></i> Admin सेटिंग्स
@@ -158,26 +157,6 @@
             </button>
           </div>
 
-          <!-- Add Branch / GPS Setup -->
-          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-            <p class="font-bold text-slate-800 flex items-center gap-1.5">
-              <i class="fa-solid fa-building-circle-check text-indigo-900"></i> नया शोरूम GPS सेट करें
-            </p>
-            <input id="branchNewName" type="text" placeholder="शोरूम का नाम (उदा. Branch B)" class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-bold outline-none">
-            <div class="grid grid-cols-2 gap-1.5">
-              <input id="branchLat" type="text" placeholder="Latitude" class="p-1.5 bg-white border border-slate-200 rounded-lg text-[10px] font-mono outline-none">
-              <input id="branchLng" type="text" placeholder="Longitude" class="p-1.5 bg-white border border-slate-200 rounded-lg text-[10px] font-mono outline-none">
-            </div>
-            <div class="grid grid-cols-2 gap-1.5 pt-1">
-              <button onclick="captureCurrentGpsForBranch()" class="py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200 font-bold rounded-lg text-[10px] cursor-pointer">
-                📍 करंट GPS लें
-              </button>
-              <button onclick="saveNewBranch()" class="py-1.5 bg-indigo-900 hover:bg-indigo-800 text-white font-bold rounded-lg text-[10px] cursor-pointer">
-                सेव करें
-              </button>
-            </div>
-          </div>
-
           <!-- Action Buttons -->
           <div class="space-y-1.5 pt-1">
             <button onclick="exportToExcel()" class="w-full py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 font-bold rounded-xl flex items-center justify-between transition cursor-pointer">
@@ -203,7 +182,7 @@
     <!-- ==================== STAFF VIEW ==================== -->
     <main id="staffView" style="display: none;" class="p-4 space-y-4 flex-1">
       
-      <!-- Staff Live Earnings & Pieces -->
+      <!-- Live Stats -->
       <div class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white p-4 rounded-2xl shadow-sm">
         <div class="flex justify-between items-center">
           <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-200">स्वीकृत कमीशन (<span id="staffBranchName">Branch</span>)</span>
@@ -221,14 +200,29 @@
         </div>
       </div>
 
-      <!-- GPS & SELFIE ATTENDANCE -->
-      <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-3">
+      <!-- ACTIVE STATUS BAR (When Checked-In) -->
+      <div id="staffActiveDutyBar" style="display: none;" class="p-3 bg-emerald-50 border border-emerald-300 rounded-2xl flex justify-between items-center shadow-xs">
+        <div class="flex items-center space-x-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <div>
+            <p class="text-xs font-bold text-emerald-950">ड्यूटी चालू है (Checked-In)</p>
+            <p class="text-[10px] text-emerald-700 font-semibold" id="staffDutyStartTime">समय: --:--</p>
+          </div>
+        </div>
+        <button onclick="recordGpsAttendance('Check-Out')" class="py-1.5 px-3 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-bold text-[11px] rounded-xl shadow-xs transition flex items-center gap-1 cursor-pointer">
+          <i class="fa-solid fa-door-open"></i> Check-Out
+        </button>
+      </div>
+
+      <!-- GPS & SELFIE ATTENDANCE CARD -->
+      <div id="staffCheckInCard" class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-3">
         <div class="flex justify-between items-center">
           <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-            <i class="fa-solid fa-location-crosshairs text-indigo-900"></i> सेल्फ़ी व GPS हाजिरी
+            <i class="fa-solid fa-camera text-indigo-900"></i> सेल्फ़ी लेकर Check-In करें
           </h3>
-          <span id="todayAttStatus" class="text-[11px] px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full font-bold">Pending</span>
+          <span class="text-[10px] px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full font-bold">Duty Off</span>
         </div>
+        <p class="text-[11px] text-slate-500">सेल्फ़ी लेते ही सही समय रिकॉर्ड हो जाएगा और सेल्स एंट्री खुल जाएगी।</p>
 
         <div class="border-2 border-dashed border-indigo-200 rounded-xl p-2.5 text-center bg-indigo-50/50 relative hover:border-indigo-500 transition">
           <input type="file" id="attendanceSelfieInput" accept="image/*" capture="user" onchange="compressAttendanceSelfie(event)" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10">
@@ -236,70 +230,72 @@
           <div id="selfiePlaceholder" class="py-2">
             <i class="fa-solid fa-camera text-indigo-900 text-2xl mb-1"></i>
             <p class="text-xs font-bold text-slate-800">1. सेल्फ़ी लें (Tap Camera)</p>
-            <span class="text-[10px] text-slate-500">हाजिरी के लिए फ़्रंट कैमरा खोलें</span>
+            <span class="text-[10px] text-slate-500">दुकान में खड़े होकर फ़्रंट कैमरा खोलें</span>
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-2.5 pt-1">
-          <button onclick="recordGpsAttendance('Check-In')" class="py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
-            <i class="fa-solid fa-circle-check"></i> ✓ Check-In
-          </button>
-          <button onclick="recordGpsAttendance('Check-Out')" class="py-2.5 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
-            <i class="fa-solid fa-door-open"></i> ✕ Check-Out
-          </button>
-        </div>
+        <button onclick="recordGpsAttendance('Check-In')" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer">
+          <i class="fa-solid fa-circle-check text-sm"></i> ✓ Check-In दर्ज करें
+        </button>
         <p id="geoMsg" class="text-[11px] text-slate-500 font-medium text-center"></p>
       </div>
 
-      <!-- MULTI-ITEM CART (BATCH ENTRY) -->
-      <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-3">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-          <i class="fa-solid fa-plus-circle text-blue-900"></i> ग्राहक आइटम फोटो एंट्री
-        </h3>
-        
-        <!-- Tag Photo Input -->
-        <div class="border-2 border-dashed border-blue-200 rounded-xl p-3 text-center bg-blue-50/40 relative hover:border-blue-500 transition">
-          <input type="file" id="tagPicInput" accept="image/*" capture="environment" onchange="compressAndPreviewTag(event)" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10">
-          <img id="tagPreview" style="display: none;" class="w-full h-32 object-cover rounded-lg mb-1 mx-auto shadow-sm">
-          <div id="tagPlaceholder" class="py-3">
-            <i class="fa-solid fa-camera text-blue-900 text-2xl mb-1"></i>
-            <p class="text-xs font-bold text-slate-800">टैग की फोटो लें (Tap Camera)</p>
-            <span class="text-[10px] text-slate-500">बारकोड / रेट टैग स्पष्ट दिखना चाहिए</span>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <select id="staffItemCategory" class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold">
-            <option value="साड़ी (Saree)">साड़ी (Saree)</option>
-            <option value="सूट / लहंगा (Suit/Lehenga)">सूट / लहंगा</option>
-            <option value="कुर्ती / रेडीमेड">कुर्ती / रेडीमेड</option>
-            <option value="मैचिंग / अन्य">मैचिंग / अन्य</option>
-          </select>
-          <input id="staffItemQty" type="number" value="1" min="1" placeholder="कुल पीस (Qty)" class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none">
-        </div>
-
-        <input id="staffItemNote" type="text" placeholder="आइटम विवरण / पहचान (वैकल्पिक)" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none">
-
-        <!-- Add To Batch Button -->
-        <button onclick="addItemToBatch()" class="w-full py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200 active:scale-95 font-bold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
-          <i class="fa-solid fa-cart-plus"></i> + लिस्ट में जोड़ें (Add to List)
-        </button>
+      <!-- LOCKED NOTICE -->
+      <div id="staffSalesLockedNotice" class="p-6 bg-slate-100 border-2 border-dashed border-slate-300 rounded-2xl text-center space-y-1.5">
+        <i class="fa-solid fa-lock text-2xl text-slate-400 mb-1"></i>
+        <p class="text-xs font-bold text-slate-700">सेल्स एंट्री अभी लॉक है</p>
+        <p class="text-[11px] text-slate-500">ऊपर सेल्फ़ी लेकर Check-In करने के बाद ही आप प्रोडक्ट भेज पाएँगे।</p>
       </div>
 
-      <!-- CURRENT BATCH / CART LIST -->
-      <div id="batchCartContainer" class="bg-indigo-50 p-4 rounded-2xl border border-indigo-200 shadow-sm" style="display: none;">
-        <div class="flex justify-between items-center mb-2">
-          <h3 class="text-xs font-black uppercase tracking-wider text-indigo-950 flex items-center gap-1.5">
-            <i class="fa-solid fa-basket-shopping text-indigo-700"></i> ग्राहक की चुनी हुई लिस्ट (<span id="batchCount">0</span>)
+      <!-- MULTI-ITEM CART (BATCH ENTRY) -->
+      <div id="staffSalesEntryArea" style="display: none;" class="space-y-4">
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-3">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-plus-circle text-blue-900"></i> ग्राहक आइटम फोटो एंट्री
           </h3>
-          <button onclick="clearCurrentBatch()" class="text-[10px] text-rose-600 font-bold hover:underline cursor-pointer">✕ खाली करें</button>
+          
+          <div class="border-2 border-dashed border-blue-200 rounded-xl p-3 text-center bg-blue-50/40 relative hover:border-blue-500 transition">
+            <input type="file" id="tagPicInput" accept="image/*" capture="environment" onchange="compressAndPreviewTag(event)" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10">
+            <img id="tagPreview" style="display: none;" class="w-full h-32 object-cover rounded-lg mb-1 mx-auto shadow-sm">
+            <div id="tagPlaceholder" class="py-3">
+              <i class="fa-solid fa-camera text-blue-900 text-2xl mb-1"></i>
+              <p class="text-xs font-bold text-slate-800">टैग की फोटो लें (Tap Camera)</p>
+              <span class="text-[10px] text-slate-500">बारकोड / रेट टैग स्पष्ट दिखना चाहिए</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <select id="staffItemCategory" class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold">
+              <option value="साड़ी (Saree)">साड़ी (Saree)</option>
+              <option value="सूट / लहंगा (Suit/Lehenga)">सूट / लहंगा</option>
+              <option value="कुर्ती / रेडीमेड">कुर्ती / रेडीमेड</option>
+              <option value="मैचिंग / अन्य">मैचिंग / अन्य</option>
+            </select>
+            <input id="staffItemQty" type="number" value="1" min="1" placeholder="कुल पीस (Qty)" class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none">
+          </div>
+
+          <input id="staffItemNote" type="text" placeholder="आइटम विवरण / पहचान (वैकल्पिक)" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none">
+
+          <button onclick="addItemToBatch()" class="w-full py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200 active:scale-95 font-bold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-cart-plus"></i> + लिस्ट में जोड़ें (Add to List)
+          </button>
         </div>
 
-        <div id="batchItemsFeed" class="space-y-2 max-h-48 overflow-y-auto mb-3"></div>
+        <!-- CURRENT BATCH / CART LIST -->
+        <div id="batchCartContainer" class="bg-indigo-50 p-4 rounded-2xl border border-indigo-200 shadow-sm" style="display: none;">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-xs font-black uppercase tracking-wider text-indigo-950 flex items-center gap-1.5">
+              <i class="fa-solid fa-basket-shopping text-indigo-700"></i> ग्राहक की चुनी हुई लिस्ट (<span id="batchCount">0</span>)
+            </h3>
+            <button onclick="clearCurrentBatch()" class="text-[10px] text-rose-600 font-bold hover:underline cursor-pointer">✕ खाली करें</button>
+          </div>
 
-        <button onclick="submitBatchToCounter()" class="w-full py-3 bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white font-black text-xs rounded-xl shadow-lg transition flex items-center justify-center gap-1.5 cursor-pointer">
-          <i class="fa-solid fa-cloud-arrow-up"></i> ये सभी आइटम काउंटर पर भेजें (Send All)
-        </button>
+          <div id="batchItemsFeed" class="space-y-2 max-h-48 overflow-y-auto mb-3"></div>
+
+          <button onclick="submitBatchToCounter()" class="w-full py-3 bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white font-black text-xs rounded-xl shadow-lg transition flex items-center justify-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-cloud-arrow-up"></i> ये सभी आइटम काउंटर पर भेजें (Send All)
+          </button>
+        </div>
       </div>
 
       <!-- Staff History -->
@@ -312,12 +308,36 @@
     <!-- ==================== OWNER VIEW ==================== -->
     <main id="ownerView" style="display: none;" class="p-4 space-y-4 flex-1">
       
-      <!-- Branch Filter -->
-      <div class="bg-white p-2.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-        <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-          <i class="fa-solid fa-code-branch text-blue-900"></i> शोरूम चुनें:
-        </span>
-        <select id="ownerBranchFilter" onchange="renderLocalData()" class="p-1.5 px-3 bg-slate-100 border border-slate-300 rounded-xl text-xs font-bold text-blue-950 outline-none"></select>
+      <!-- Branch & Date Period Filter Card -->
+      <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-code-branch text-blue-900"></i> शोरूम:
+          </span>
+          <select id="ownerBranchFilter" onchange="renderLocalData()" class="p-1.5 px-3 bg-slate-100 border border-slate-300 rounded-xl text-xs font-bold text-blue-950 outline-none"></select>
+        </div>
+
+        <div class="pt-2 border-t border-slate-100 space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+              <i class="fa-regular fa-calendar-days text-blue-900"></i> तारीख अवधि (Period):
+            </span>
+            <button onclick="clearDateFilter()" class="py-1 px-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-[10px] font-bold cursor-pointer">
+              ✕ Reset (All)
+            </button>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[10px] font-bold text-slate-500 block mb-0.5">कब से (From):</label>
+              <input id="ownerDateFrom" type="date" onchange="renderLocalData()" class="w-full p-1.5 bg-slate-100 border border-slate-300 rounded-xl text-xs font-bold text-blue-950 outline-none">
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-slate-500 block mb-0.5">कब तक (To):</label>
+              <input id="ownerDateTo" type="date" onchange="renderLocalData()" class="w-full p-1.5 bg-slate-100 border border-slate-300 rounded-xl text-xs font-bold text-blue-950 outline-none">
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Top Summary -->
@@ -332,7 +352,7 @@
         </div>
         <div class="flex justify-between items-center text-xs text-blue-200/80 mt-3 pt-3 border-t border-blue-800/60 font-medium">
           <span>स्वीकृत बिल: <strong id="ownerTotalBills" class="text-white">0</strong></span>
-          <span>पेंडिंग एंट्रीज: <strong id="ownerPendingCount" class="text-amber-300 font-black">0</strong></span>
+          <span>पेंडिंग बिल: <strong id="ownerPendingCount" class="text-amber-300 font-black">0</strong></span>
         </div>
       </div>
 
@@ -341,14 +361,28 @@
         <i class="fa-solid fa-table-list text-base text-amber-400"></i> सभी स्वीकृत बिलों की मास्टर लिस्ट (Full Table)
       </button>
 
-      <!-- PENDING APPROVAL QUEUE -->
+      <!-- PENDING ATTENDANCE APPROVALS -->
+      <div id="pendingAttendanceSection" class="bg-emerald-50/90 p-4 rounded-2xl border border-emerald-300 shadow-sm" style="display: none;">
+        <div class="flex justify-between items-center mb-2.5">
+          <div>
+            <h3 class="text-xs font-black uppercase tracking-wider text-emerald-950 flex items-center gap-1.5">
+              <i class="fa-solid fa-user-check text-emerald-700"></i> पेंडिंग हाजिरी अप्रूवल (Check-In)
+            </h3>
+            <p class="text-[10px] text-slate-500 mt-0.5">स्टाफ की सेल्फ़ी व समय देखकर हाजिरी पास करें</p>
+          </div>
+          <span id="pendingAttBadge" class="text-[10px] bg-emerald-200 text-emerald-900 font-black px-2 py-0.5 rounded-full">0 Staff</span>
+        </div>
+        <div id="pendingAttendanceFeed" class="space-y-2.5 text-xs"></div>
+      </div>
+
+      <!-- PENDING BILL APPROVAL QUEUE -->
       <div class="bg-amber-50/90 p-4 rounded-2xl border border-amber-300 shadow-sm">
         <div class="flex justify-between items-center mb-2.5">
           <div>
             <h3 class="text-xs font-black uppercase tracking-wider text-amber-950 flex items-center gap-1.5">
-              <i class="fa-solid fa-bell text-amber-700"></i> पेंडिंग अप्रूवल लिस्ट
+              <i class="fa-solid fa-bell text-amber-700"></i> पेंडिंग बिल अप्रूवल लिस्ट
             </h3>
-            <p class="text-[10px] text-slate-500 mt-0.5">टैग फ़ोटो चेक करें, बिल नं. या राशि चाहें तो डालें, और पास करें</p>
+            <p class="text-[10px] text-slate-500 mt-0.5">टैग फ़ोटो चेक करें, बिल नं. व राशि डालकर पास करें</p>
           </div>
           <span id="pendingQueueBadge" class="text-[10px] bg-amber-200 text-amber-900 font-black px-2 py-0.5 rounded-full">0 Pending</span>
         </div>
@@ -371,6 +405,19 @@
         </div>
       </div>
 
+      <!-- Attendance Feed (History) -->
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div onclick="toggleSection('secAttendance', 'iconAtt')" class="p-4 flex justify-between items-center cursor-pointer hover:bg-slate-50 transition">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-location-dot text-rose-500"></i> स्वीकृत हाजिरी रिकॉर्ड (Attendance Log)
+          </h3>
+          <i id="iconAtt" class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform"></i>
+        </div>
+        <div id="secAttendance" style="display: none;" class="p-4 pt-0 border-t border-slate-100">
+          <div id="ownerAttendanceFeed" class="space-y-2.5 max-h-64 overflow-y-auto text-xs mt-3"></div>
+        </div>
+      </div>
+
       <!-- Registered Staff & Management -->
       <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
         <div onclick="toggleSection('secEmployees', 'iconEmp')" class="p-4 flex justify-between items-center cursor-pointer hover:bg-slate-50 transition">
@@ -381,35 +428,6 @@
         </div>
         <div id="secEmployees" style="display: block;" class="p-4 pt-0 border-t border-slate-100">
           <div id="ownerEmployeeList" class="space-y-2 max-h-56 overflow-y-auto text-xs mt-3"></div>
-        </div>
-      </div>
-
-      <!-- Attendance Feed -->
-      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-        <div onclick="toggleSection('secAttendance', 'iconAtt')" class="p-4 flex justify-between items-center cursor-pointer hover:bg-slate-50 transition">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-            <i class="fa-solid fa-location-dot text-rose-500"></i> सेल्फ़ी व GPS हाजिरी रिकॉर्ड
-          </h3>
-          <i id="iconAtt" class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform"></i>
-        </div>
-        <div id="secAttendance" style="display: none;" class="p-4 pt-0 border-t border-slate-100">
-          <div id="ownerAttendanceFeed" class="space-y-2.5 max-h-64 overflow-y-auto text-xs mt-3"></div>
-        </div>
-      </div>
-
-      <!-- Final Sales History -->
-      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-        <div onclick="toggleSection('secSalesHistory', 'iconSale')" class="p-4 flex justify-between items-center cursor-pointer hover:bg-slate-50 transition">
-          <div>
-            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-              <i class="fa-solid fa-clipboard-check text-emerald-700"></i> स्वीकृत बिल हिस्ट्री (Detailed)
-            </h3>
-            <p class="text-[10px] text-slate-400 mt-0.5">तारीख, समय व पूरी जानकारी के लिए बिल पर टैप करें</p>
-          </div>
-          <i id="iconSale" class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform"></i>
-        </div>
-        <div id="secSalesHistory" style="display: none;" class="p-4 pt-0 border-t border-slate-100">
-          <div id="ownerAllSalesFeed" class="space-y-2 max-h-64 overflow-y-auto text-xs mt-3"></div>
         </div>
       </div>
     </main>
@@ -467,13 +485,7 @@
       console.warn("Firebase Init", e);
     }
 
-    var defaultPieceRules = {
-      saree: 50,
-      suit: 40,
-      kurti: 20,
-      other: 15
-    };
-
+    var defaultPieceRules = { saree: 50, suit: 40, kurti: 20, other: 15 };
     var defaultBranches = [
       { name: "Main Showroom", lat: 0, lng: 0, radius: 150 },
       { name: "Branch 2", lat: 0, lng: 0, radius: 150 }
@@ -514,6 +526,51 @@
         localStorage.setItem('shw_branches', JSON.stringify(b));
       }
     };
+
+    function autoMidnightCheckOutVerification() {
+      var attendance = LocalDB.get('attendance');
+      if (!attendance || attendance.length === 0) return;
+
+      var todayIso = new Date().toISOString().split('T')[0];
+      var employees = LocalDB.get('employees');
+      var updated = false;
+
+      // Check each employee's last attendance record
+      employees.forEach(function(emp) {
+        var empAtt = attendance.filter(function(a) { return a && (a.empId === emp.id || a.user === emp.name); });
+        if (empAtt.length > 0) {
+          var lastRecord = empAtt[0]; // latest record
+          
+          // If last record was Check-In AND it is from a previous day (past date)
+          if (lastRecord.type === 'Check-In' && lastRecord.isoDate && lastRecord.isoDate < todayIso) {
+            var autoId = "ATT_AUTO_" + Date.now() + "_" + emp.id;
+            var autoRecord = {
+              id: autoId,
+              user: emp.name,
+              empId: emp.id,
+              branch: emp.branch || 'Main Showroom',
+              type: 'Check-Out (Auto Night Close)',
+              time: '11:59:59 PM',
+              date: lastRecord.date,
+              isoDate: lastRecord.isoDate,
+              selfie: '',
+              location: 'System Midnight Override',
+              mapLink: '',
+              status: 'approved',
+              timestamp: (lastRecord.timestamp || Date.now()) + 1000
+            };
+
+            attendance.unshift(autoRecord);
+            if (db) db.collection("attendance").doc(autoId).set(autoRecord);
+            updated = true;
+          }
+        }
+      });
+
+      if (updated) {
+        LocalDB.set('attendance', attendance);
+      }
+    }
 
     function toggleDotMenu() {
       var modal = document.getElementById('dotMenuModal');
@@ -590,6 +647,8 @@
     }
 
     function launchApp() {
+      autoMidnightCheckOutVerification();
+
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('appContainer').style.display = 'flex';
       document.getElementById('headerUserName').innerText = currentUser;
@@ -619,32 +678,12 @@
       startRealtimeCloudSync();
     }
 
-    function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
-      if (!lat1 || !lon1 || !lat2 || !lon2) return 0;
-      var R = 6371e3;
-      var φ1 = lat1 * Math.PI / 180;
-      var φ2 = lat2 * Math.PI / 180;
-      var Δφ = (lat2 - lat1) * Math.PI / 180;
-      var Δλ = (lon2 - lon1) * Math.PI / 180;
-
-      var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ/2) * Math.sin(Δλ/2);
-      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      return Math.round(R * c);
-    }
-
-    function captureCurrentGpsForBranch() {
-      if (!navigator.geolocation) { alert("GPS उपलब्ध नहीं है!"); return; }
-      navigator.geolocation.getCurrentPosition(
-        function(pos) {
-          document.getElementById('branchLat').value = pos.coords.latitude.toFixed(6);
-          document.getElementById('branchLng').value = pos.coords.longitude.toFixed(6);
-          alert("✓ लोकेशन कैप्चर हुई! अब 'सेव करें' दबाएँ।");
-        },
-        function() { alert("कृपया फ़ोन की GPS लोकेशन ऑन करें!"); },
-        { enableHighAccuracy: true }
-      );
+    function clearDateFilter() {
+      var dFrom = document.getElementById('ownerDateFrom');
+      var dTo = document.getElementById('ownerDateTo');
+      if (dFrom) dFrom.value = '';
+      if (dTo) dTo.value = '';
+      renderLocalData();
     }
 
     function compressAndPreviewTag(event) {
@@ -740,17 +779,23 @@
     }
 
     function recordGpsAttendance(type) {
-      if (!attendanceSelfieData) {
+      if (type === 'Check-In' && !attendanceSelfieData) {
         alert("⚠️ कृपया पहले सेल्फ़ी लें!");
         return;
       }
 
+      var exactTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      var exactDate = new Date().toLocaleDateString('hi-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+      var isoDate = new Date().toISOString().split('T')[0];
+
       var geoMsg = document.getElementById('geoMsg');
-      geoMsg.innerText = "📍 GPS लोकेशन जाँची जा रही है...";
-      geoMsg.className = "text-[11px] text-blue-600 font-bold text-center";
+      if (geoMsg) {
+        geoMsg.innerText = "📍 हाजिरी दर्ज की जा रही है...";
+        geoMsg.className = "text-[11px] text-blue-600 font-bold text-center";
+      }
 
       if (!navigator.geolocation) {
-        saveAttendanceRecord(type, "GPS Not Supported", "", 0, "Unknown");
+        saveAttendanceRecord(type, "GPS Not Supported", "", exactTime, exactDate, isoDate);
         return;
       }
 
@@ -761,34 +806,16 @@
           var mapLink = "https://www.google.com/maps?q=" + lat + "," + lng;
           var locStr = lat.toFixed(5) + ", " + lng.toFixed(5);
 
-          var branches = LocalDB.getBranches();
-          var myBranchObj = branches.find(function(b) { return b.name.toLowerCase() === currentBranch.toLowerCase(); }) || branches[0];
-          
-          var distance = 0;
-          var geofenceStatus = "Verified (" + currentBranch + ")";
-
-          if (myBranchObj && myBranchObj.lat && myBranchObj.lng) {
-            distance = calculateDistanceMeters(lat, lng, myBranchObj.lat, myBranchObj.lng);
-            var radius = myBranchObj.radius || 150;
-            if (distance > radius) {
-              geofenceStatus = "Outside (" + distance + "m दूर)";
-            } else {
-              geofenceStatus = "Inside (" + distance + "m)";
-            }
-          }
-
-          saveAttendanceRecord(type, locStr, mapLink, distance, geofenceStatus);
+          saveAttendanceRecord(type, locStr, mapLink, exactTime, exactDate, isoDate);
         },
         function(error) {
-          saveAttendanceRecord(type, "Location Off", "", 0, "No GPS");
+          saveAttendanceRecord(type, "Location Off", "", exactTime, exactDate, isoDate);
         },
-        { timeout: 10000, enableHighAccuracy: true }
+        { timeout: 8000, enableHighAccuracy: true }
       );
     }
 
-    function saveAttendanceRecord(type, locationStr, mapLink, distance, geofenceStatus) {
-      var time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      var date = new Date().toLocaleDateString('hi-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    function saveAttendanceRecord(type, locationStr, mapLink, exactTime, exactDate, isoDate) {
       var attId = "ATT_" + Date.now();
 
       var record = {
@@ -797,13 +824,13 @@
         empId: currentEmpId,
         branch: currentBranch,
         type: type,
-        time: time,
-        date: date,
+        time: exactTime,
+        date: exactDate,
+        isoDate: isoDate,
         selfie: attendanceSelfieData,
         location: locationStr,
         mapLink: mapLink,
-        distance: distance,
-        geofenceStatus: geofenceStatus,
+        status: (type === 'Check-In' ? 'pending_approval' : 'approved'),
         timestamp: Date.now()
       };
 
@@ -823,24 +850,39 @@
       if (prevEl) prevEl.style.display = 'none';
       if (placeEl) placeEl.style.display = 'block';
 
-      var geoMsg = document.getElementById('geoMsg');
-      geoMsg.innerText = "✓ " + type + " दर्ज हुआ: " + geofenceStatus;
-      geoMsg.className = "text-[11px] text-emerald-600 font-bold text-center";
+      alert("✓ " + type + " दर्ज हुआ!\nसमय: " + exactTime);
+      renderLocalData();
+    }
 
-      var attBadge = document.getElementById('todayAttStatus');
-      if (attBadge) {
-        attBadge.innerText = type + " ✓";
-        attBadge.className = "text-[11px] px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full font-bold";
+    function approveAttendance(attId) {
+      var attendance = LocalDB.get('attendance');
+      var att = attendance.find(function(a) { return String(a.id) === String(attId); });
+      if (att) {
+        att.status = 'approved';
+        LocalDB.set('attendance', attendance);
+        if (db) db.collection("attendance").doc(String(attId)).update({ status: 'approved' });
       }
+      alert("✓ हाजिरी स्वीकृत (Approved) हो गई!");
+      renderLocalData();
+    }
 
-      alert("✓ " + type + " दर्ज हुआ!\nस्थिति: " + geofenceStatus);
+    function rejectAttendance(attId) {
+      if (!confirm("क्या आप इस हाजिरी को रिजेक्ट करना चाहते हैं?")) return;
+      var attendance = LocalDB.get('attendance');
+      var att = attendance.find(function(a) { return String(a.id) === String(attId); });
+      if (att) {
+        att.status = 'rejected';
+        LocalDB.set('attendance', attendance);
+        if (db) db.collection("attendance").doc(String(attId)).update({ status: 'rejected' });
+      }
       renderLocalData();
     }
 
     function forceCheckOutStaff(empId, empName) {
       if (!confirm(empName + " को Force Check-Out करना चाहते हैं?")) return;
-      var time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      var date = new Date().toLocaleDateString('hi-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+      var exactTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      var exactDate = new Date().toLocaleDateString('hi-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+      var isoDate = new Date().toISOString().split('T')[0];
       var attId = "ATT_" + Date.now();
 
       var record = {
@@ -849,13 +891,13 @@
         empId: empId,
         branch: currentBranch,
         type: 'Check-Out (By Admin)',
-        time: time,
-        date: date,
+        time: exactTime,
+        date: exactDate,
+        isoDate: isoDate,
         selfie: '',
         location: 'Admin Override',
         mapLink: '',
-        distance: 0,
-        geofenceStatus: 'Admin Forced',
+        status: 'approved',
         timestamp: Date.now()
       };
 
@@ -950,6 +992,7 @@
       var batchId = "BATCH_" + Date.now();
       var exactTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       var exactDate = new Date().toLocaleDateString('hi-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+      var isoDate = new Date().toISOString().split('T')[0];
       var sales = LocalDB.get('sales');
 
       for (var i = 0; i < currentBatchItems.length; i++) {
@@ -968,6 +1011,7 @@
           empId: currentEmpId,
           sentTime: exactTime,
           date: exactDate,
+          isoDate: isoDate,
           status: 'pending_counter',
           amount: 0,
           billNo: '',
@@ -1047,32 +1091,6 @@
       renderLocalData();
     }
 
-    // Detailed Sale Pop-up
-    function showDetailedSaleReport(itemId) {
-      var sales = LocalDB.get('sales');
-      var item = sales.find(function(s) { return String(s.id) === String(itemId); });
-      if (!item) return;
-
-      document.getElementById('reportModalTitle').innerHTML = '<i class="fa-solid fa-receipt text-blue-900"></i> बिल #' + (item.billNo || 'Auto') + ' का विवरण';
-      
-      var tagImgHtml = item.tagPic ? '<div class="text-center my-2"><img src="' + item.tagPic + '" onclick="openImageModal(this.src)" class="w-full h-36 object-cover rounded-xl border border-slate-200 shadow-sm cursor-pointer"><span class="text-[10px] text-slate-400 mt-0.5 block">टैग फोटो (Tap to zoom)</span></div>' : '';
-
-      var content = document.getElementById('reportContent');
-      content.innerHTML = tagImgHtml + 
-        '<div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-500">तारीख (Date):</span> <span class="font-bold text-slate-900">' + (item.date || '-') + '</span></div>' +
-        '<div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-500">स्वीकृत समय (Time):</span> <span class="font-bold text-slate-900">' + (item.billedTime || item.sentTime || '-') + '</span></div>' +
-        '<div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-500">स्टाफ नाम (Staff):</span> <span class="font-bold text-blue-950">' + (item.staff || '-') + ' (ID: ' + (item.empId || '-') + ')</span></div>' +
-        '<div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-500">शोरूम शाखा (Branch):</span> <span class="font-bold text-indigo-900">' + (item.branch || '-') + '</span></div>' +
-        '<div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-500">आइटम / श्रेणी:</span> <span class="font-black text-slate-900">' + (item.category || '-') + '</span></div>' +
-        '<div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-500">कुल मात्रा (Quantity):</span> <span class="font-black text-indigo-900 bg-indigo-50 px-2 py-0.5 rounded">' + (item.qty || 1) + ' Piece</span></div>' +
-        '<div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-500">पेमेंट मोड (Payment):</span> <span class="font-bold text-slate-800">' + (item.payment || 'Cash') + '</span></div>' +
-        '<div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-500">बिल राशि (Amount):</span> <span class="font-black text-slate-900 text-sm">₹' + (item.amount || 0).toLocaleString() + '</span></div>' +
-        '<div class="flex justify-between bg-emerald-50 p-2.5 rounded-xl mt-2 border border-emerald-200"><span class="text-emerald-900 font-bold">स्टाफ कमीशन (₹):</span> <span class="font-black text-emerald-800 text-sm">+₹' + (item.commission || 0).toLocaleString() + '</span></div>';
-
-      document.getElementById('reportModal').style.display = 'flex';
-    }
-
-    // Detailed Staff Target Pop-up
     function showStaffTargetReport(empId) {
       var employees = LocalDB.get('employees');
       var emp = employees.find(function(e) { return e.id === empId; });
@@ -1107,24 +1125,33 @@
       document.getElementById('reportModal').style.display = 'flex';
     }
 
-    // Master Sales Table Pop-up
     function showMasterSalesTable() {
       var sales = LocalDB.get('sales').filter(function(s) { return s.status === 'billed' || s.status === 'approved'; });
       var branchFilter = document.getElementById('ownerBranchFilter');
       var selectedBranch = branchFilter ? branchFilter.value : "All";
+      var dFrom = document.getElementById('ownerDateFrom') ? document.getElementById('ownerDateFrom').value : "";
+      var dTo = document.getElementById('ownerDateTo') ? document.getElementById('ownerDateTo').value : "";
 
       if (selectedBranch && selectedBranch !== "All") {
         sales = sales.filter(function(s) { return s.branch === selectedBranch; });
+      }
+
+      if (dFrom) {
+        sales = sales.filter(function(s) { return s.isoDate && s.isoDate >= dFrom; });
+      }
+      if (dTo) {
+        sales = sales.filter(function(s) { return s.isoDate && s.isoDate <= dTo; });
       }
 
       var totalAmt = sales.reduce(function(a, b) { return a + (parseFloat(b.amount) || 0); }, 0);
       var totalPcs = sales.reduce(function(a, b) { return a + (parseInt(b.qty) || 1); }, 0);
       var totalComm = sales.reduce(function(a, b) { return a + (parseFloat(b.commission) || 0); }, 0);
 
-      document.getElementById('reportModalTitle').innerHTML = '<i class="fa-solid fa-table-list text-blue-900"></i> मास्टर सेल्स रिपोर्ट (' + sales.length + ' Bills)';
+      var periodText = (dFrom || dTo) ? " (" + (dFrom || 'Start') + " to " + (dTo || 'End') + ")" : "";
+      document.getElementById('reportModalTitle').innerHTML = '<i class="fa-solid fa-table-list text-blue-900"></i> मास्टर सेल्स रिपोर्ट ' + periodText + ' (' + sales.length + ' Bills)';
       
       if (sales.length === 0) {
-        document.getElementById('reportContent').innerHTML = '<p class="text-center py-6 text-slate-400 font-medium">कोई स्वीकृत बिल मौजूद नहीं है।</p>';
+        document.getElementById('reportContent').innerHTML = '<p class="text-center py-6 text-slate-400 font-medium">चुनी हुई अवधि/शाखा में कोई स्वीकृत बिल नहीं है।</p>';
         document.getElementById('reportModal').style.display = 'flex';
         return;
       }
@@ -1179,6 +1206,8 @@
 
       var branchFilter = document.getElementById('ownerBranchFilter');
       var selectedBranch = branchFilter ? branchFilter.value : "All";
+      var dFrom = document.getElementById('ownerDateFrom') ? document.getElementById('ownerDateFrom').value : "";
+      var dTo = document.getElementById('ownerDateTo') ? document.getElementById('ownerDateTo').value : "";
 
       if (branchFilter && branchFilter.options.length === 0) {
         branchFilter.innerHTML = '<option value="All">सभी शोरूम (All)</option>' +
@@ -1195,13 +1224,26 @@
       var filteredAtt = attendance;
 
       if (selectedBranch && selectedBranch !== "All") {
-        filteredSales = sales.filter(function(s) { return s && s.branch === selectedBranch; });
-        filteredEmp = employees.filter(function(e) { return e && e.branch === selectedBranch; });
-        filteredAtt = attendance.filter(function(a) { return a && a.branch === selectedBranch; });
+        filteredSales = filteredSales.filter(function(s) { return s && s.branch === selectedBranch; });
+        filteredEmp = filteredEmp.filter(function(e) { return e && e.branch === selectedBranch; });
+        filteredAtt = filteredAtt.filter(function(a) { return a && a.branch === selectedBranch; });
+      }
+
+      // Filter by Date Range (From - To)
+      if (dFrom) {
+        filteredSales = filteredSales.filter(function(s) { return s && s.isoDate && s.isoDate >= dFrom; });
+        filteredAtt = filteredAtt.filter(function(a) { return a && a.isoDate && a.isoDate >= dFrom; });
+      }
+      if (dTo) {
+        filteredSales = filteredSales.filter(function(s) { return s && s.isoDate && s.isoDate <= dTo; });
+        filteredAtt = filteredAtt.filter(function(a) { return a && a.isoDate && a.isoDate <= dTo; });
       }
 
       var cardBranchLabel = document.getElementById('cardBranchLabel');
-      if (cardBranchLabel) cardBranchLabel.innerText = selectedBranch;
+      if (cardBranchLabel) {
+        var pText = (dFrom || dTo) ? " | " + (dFrom || 'Start') + " to " + (dTo || 'End') : "";
+        cardBranchLabel.innerText = selectedBranch + pText;
+      }
 
       // Staff View Data
       try {
@@ -1226,6 +1268,39 @@
         
         var staffCommEl = document.getElementById('staffCommissionVal');
         if (staffCommEl) staffCommEl.innerText = "₹" + myTotalComm.toLocaleString();
+
+        var myAttHistory = attendance.filter(function(a) { return a && (a.user === currentUser || a.empId === currentEmpId); });
+        var isCheckedIn = false;
+        var checkInTime = "";
+
+        if (myAttHistory.length > 0) {
+          var lastAtt = myAttHistory[0];
+          var todayIso = new Date().toISOString().split('T')[0];
+          // Check-In is active ONLY if it's from today and type is Check-In
+          if (lastAtt.type === 'Check-In' && (!lastAtt.isoDate || lastAtt.isoDate === todayIso)) {
+            isCheckedIn = true;
+            checkInTime = lastAtt.time || '';
+          }
+        }
+
+        var checkInCard = document.getElementById('staffCheckInCard');
+        var activeBar = document.getElementById('staffActiveDutyBar');
+        var salesArea = document.getElementById('staffSalesEntryArea');
+        var lockNotice = document.getElementById('staffSalesLockedNotice');
+        var dutyTimeText = document.getElementById('staffDutyStartTime');
+
+        if (isCheckedIn) {
+          if (checkInCard) checkInCard.style.display = 'none';
+          if (activeBar) activeBar.style.display = 'flex';
+          if (salesArea) salesArea.style.display = 'block';
+          if (lockNotice) lockNotice.style.display = 'none';
+          if (dutyTimeText) dutyTimeText.innerText = "चेक-इन समय: " + checkInTime;
+        } else {
+          if (checkInCard) checkInCard.style.display = 'block';
+          if (activeBar) activeBar.style.display = 'none';
+          if (salesArea) salesArea.style.display = 'none';
+          if (lockNotice) lockNotice.style.display = 'block';
+        }
 
         var staffLogEl = document.getElementById('staffSentLog');
         if (staffLogEl) {
@@ -1258,7 +1333,48 @@
         }
       } catch(e) {}
 
-      // Owner View Stats
+      // Pending Attendance
+      var pendingAttList = filteredAtt.filter(function(a) { return a && a.type === 'Check-In' && a.status === 'pending_approval'; });
+      var pendingAttSec = document.getElementById('pendingAttendanceSection');
+      var pendingAttFeed = document.getElementById('pendingAttendanceFeed');
+      var pendingAttBadge = document.getElementById('pendingAttBadge');
+
+      if (pendingAttSec && pendingAttFeed) {
+        if (pendingAttList.length > 0) {
+          pendingAttSec.style.display = 'block';
+          if (pendingAttBadge) pendingAttBadge.innerText = pendingAttList.length + " Request";
+
+          var aHtml = '';
+          for (var x = 0; x < pendingAttList.length; x++) {
+            var pa = pendingAttList[x];
+            var sImg = pa.selfie ? '<img src="' + pa.selfie + '" onclick="openImageModal(this.src)" class="w-12 h-12 rounded-xl object-cover border-2 border-emerald-600 cursor-pointer shadow">' : '<div class="w-12 h-12 rounded-xl bg-slate-200 flex items-center justify-center text-[10px]">No Pic</div>';
+            var mapBtn = pa.mapLink ? '<a href="' + pa.mapLink + '" target="_blank" class="text-[10px] text-blue-700 bg-blue-50 px-2 py-0.5 rounded font-bold hover:underline">📍 Map</a>' : '';
+
+            aHtml += '<div class="flex justify-between items-center p-2.5 bg-white border border-emerald-200 rounded-xl shadow-xs">' +
+              '<div class="flex items-center space-x-2.5">' +
+                sImg +
+                '<div>' +
+                  '<div class="flex items-center gap-1.5">' +
+                    '<span class="font-bold text-slate-900 text-xs">' + (pa.user || 'User') + '</span>' +
+                    '<span class="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.2 rounded">' + (pa.branch || 'Branch') + '</span>' +
+                  '</div>' +
+                  '<p class="text-[10px] text-slate-500 mt-0.5">⏰ चेक-इन समय: <strong class="text-slate-800">' + (pa.time || '') + '</strong></p>' +
+                  '<p class="text-[9px] text-slate-400">' + (pa.date || '') + ' ' + mapBtn + '</p>' +
+                '</div>' +
+              '</div>' +
+              '<div class="flex items-center gap-1.5">' +
+                '<button onclick="approveAttendance(\'' + pa.id + '\')" class="py-1.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg shadow-xs cursor-pointer">✓ पास करें</button>' +
+                '<button onclick="rejectAttendance(\'' + pa.id + '\')" class="py-1.5 px-2 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs rounded-lg cursor-pointer">✕</button>' +
+              '</div>' +
+            '</div>';
+          }
+          pendingAttFeed.innerHTML = aHtml;
+        } else {
+          pendingAttSec.style.display = 'none';
+        }
+      }
+
+      // Owner Pending Sales & Summary
       var pendingCounter = filteredSales.filter(function(s) { return s && (s.status === 'pending_counter' || s.status === 'pending' || !s.status); });
       var billedSales = filteredSales.filter(function(s) { return s && (s.status === 'billed' || s.status === 'approved'); });
       
@@ -1274,12 +1390,12 @@
         document.getElementById('pendingQueueBadge').innerText = pendingCounter.length + " Pending";
       }
 
-      // Owner Pending Queue Feed
+      // Pending Bills Feed
       try {
         var counterFeed = document.getElementById('counterQueueFeed');
         if (counterFeed) {
           if (pendingCounter.length === 0) {
-            counterFeed.innerHTML = '<p class="text-slate-500 text-center py-3 font-medium">✨ कोई पेंडिंग एंट्री नहीं है!</p>';
+            counterFeed.innerHTML = '<p class="text-slate-500 text-center py-3 font-medium">✨ कोई पेंडिंग बिल नहीं है!</p>';
           } else {
             var qHtml = '';
             for (var k = 0; k < pendingCounter.length; k++) {
@@ -1296,6 +1412,10 @@
               var curBill = s.billNo || '';
               var curAmt = (s.amount && s.amount > 0) ? s.amount : '';
 
+              var stAtt = attendance.find(function(a) { return a && (a.empId === stEmp || a.user === stName) && a.type === 'Check-In'; });
+              var attTimeStr = stAtt ? stAtt.time : '--:--';
+              var attSelfieHtml = (stAtt && stAtt.selfie) ? '<img src="' + stAtt.selfie + '" onclick="openImageModal(this.src)" class="w-8 h-8 rounded-full object-cover border border-emerald-500 shadow-xs cursor-pointer" title="स्टाफ हाजिरी सेल्फ़ी">' : '<div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-[8px] font-bold">No Pic</div>';
+
               var tPicHtml = s.tagPic ? '<img src="' + s.tagPic + '" onclick="openImageModal(this.src)" class="w-full h-36 object-cover rounded-xl border border-slate-200 cursor-pointer shadow-sm"><span class="text-[10px] font-bold text-slate-500 mt-1 block text-center">🔍 टैग फ़ोटो (Tap to Zoom)</span>' : '<div class="w-full h-24 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 text-xs">No Photo</div>';
 
               qHtml += '<div class="p-3.5 bg-white border border-amber-300 rounded-2xl shadow-sm space-y-3 mb-3">' +
@@ -1306,8 +1426,14 @@
                       '<span class="text-[11px] bg-blue-100 text-blue-900 font-black px-2 py-0.5 rounded-full">' + qty + ' Piece</span>' +
                       '<span class="text-[9px] bg-indigo-100 text-indigo-900 font-bold px-1.5 py-0.5 rounded">' + sBranch + '</span>' +
                     '</div>' +
-                    '<p class="text-[11px] text-blue-950 font-bold mt-1">👤 स्टाफ: ' + stName + ' (' + stEmp + ')</p>' +
-                    '<p class="text-[10px] text-slate-500">📅 ' + sDate + ' • ⏰ ' + sTime + ' • 📝 ' + sNote + '</p>' +
+                    '<div class="flex items-center gap-2 mt-1.5 p-1.5 bg-slate-50 rounded-xl border border-slate-100">' +
+                      attSelfieHtml +
+                      '<div>' +
+                        '<p class="text-[11px] text-blue-950 font-bold leading-tight">' + stName + ' (' + stEmp + ')</p>' +
+                        '<p class="text-[9px] text-emerald-700 font-semibold">चेक-इन समय: ' + attTimeStr + '</p>' +
+                      '</div>' +
+                    '</div>' +
+                    '<p class="text-[10px] text-slate-500 mt-1">📅 ' + sDate + ' • ⏰ आइटम समय: ' + sTime + ' • 📝 ' + sNote + '</p>' +
                   '</div>' +
                   '<button onclick="rejectCounterItem(\'' + safeId + '\')" class="text-[10px] text-rose-600 font-bold hover:underline cursor-pointer">✕ रिजेक्ट</button>' +
                 '</div>' +
@@ -1342,7 +1468,7 @@
         }
       } catch(e) {}
 
-      // Commission Feed (Clickable for Staff Dashboard)
+      // Commission Feed
       try {
         var commFeed = document.getElementById('ownerCommissionFeed');
         if (commFeed) {
@@ -1376,6 +1502,39 @@
               '</div>';
             }
             commFeed.innerHTML = cHtml;
+          }
+        }
+      } catch(e) {}
+
+      // Attendance Feed (History - Only Approved & Range Filtered)
+      try {
+        var ownerAttEl = document.getElementById('ownerAttendanceFeed');
+        if (ownerAttEl) {
+          var approvedAttList = filteredAtt.filter(function(a) { return a && (a.status === 'approved' || !a.status); });
+          if (approvedAttList.length === 0) {
+            ownerAttEl.innerHTML = '<p class="text-slate-400 text-center py-2">चुनी हुई अवधि में कोई स्वीकृत हाजिरी दर्ज नहीं है</p>';
+          } else {
+            var aHtml = '';
+            for (var a = 0; a < approvedAttList.length; a++) {
+              var at = approvedAttList[a];
+              var selfieImg = at.selfie ? '<img src="' + at.selfie + '" onclick="openImageModal(this.src)" class="w-10 h-10 rounded-full object-cover border-2 border-indigo-900 cursor-pointer shadow-sm">' : '<div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold">No Pic</div>';
+              var mapBtn = at.mapLink ? '<a href="' + at.mapLink + '" target="_blank" class="text-[10px] text-blue-700 bg-blue-50 px-2 py-0.5 rounded font-bold hover:underline flex items-center gap-1"><i class="fa-solid fa-location-arrow"></i> Map</a>' : '';
+
+              aHtml += '<div class="flex justify-between items-center p-2.5 bg-slate-50 border border-slate-200 rounded-xl mb-2">' +
+                '<div class="flex items-center space-x-2.5">' +
+                  selfieImg +
+                  '<div>' +
+                    '<span class="font-bold text-slate-900 text-xs">' + (at.user || 'User') + '</span>' +
+                    '<p class="text-[10px] text-slate-500 mt-0.5">' + (at.date || '') + ' • ' + (at.time || '') + '</p>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="flex items-center gap-1.5">' +
+                  '<span class="text-[10px] font-bold ' + (at.type === 'Check-In' ? 'text-emerald-700 bg-emerald-100' : 'text-rose-700 bg-rose-100') + ' px-2 py-0.5 rounded-full">' + at.type + '</span>' +
+                  mapBtn +
+                '</div>' +
+              '</div>';
+            }
+            ownerAttEl.innerHTML = aHtml;
           }
         }
       } catch(e) {}
@@ -1415,74 +1574,6 @@
               '</div>';
             }
             empListEl.innerHTML = eHtml;
-          }
-        }
-      } catch(e) {}
-
-      // Attendance Feed
-      try {
-        var ownerAttEl = document.getElementById('ownerAttendanceFeed');
-        if (ownerAttEl) {
-          if (filteredAtt.length === 0) {
-            ownerAttEl.innerHTML = '<p class="text-slate-400 text-center py-2">कोई हाजिरी दर्ज नहीं है</p>';
-          } else {
-            var aHtml = '';
-            for (var a = 0; a < filteredAtt.length; a++) {
-              var at = filteredAtt[a];
-              var selfieImg = at.selfie ? '<img src="' + at.selfie + '" onclick="openImageModal(this.src)" class="w-10 h-10 rounded-full object-cover border-2 border-indigo-900 cursor-pointer shadow-sm">' : '<div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold">No Pic</div>';
-              var mapBtn = at.mapLink ? '<a href="' + at.mapLink + '" target="_blank" class="text-[10px] text-blue-700 bg-blue-50 px-2 py-0.5 rounded font-bold hover:underline flex items-center gap-1"><i class="fa-solid fa-location-arrow"></i> Map</a>' : '';
-
-              var isOutside = at.geofenceStatus && at.geofenceStatus.indexOf('Outside') !== -1;
-              var geoBadge = '<span class="text-[9px] font-bold ' + (isOutside ? 'text-rose-700 bg-rose-50 border border-rose-200' : 'text-emerald-700 bg-emerald-50 border border-emerald-200') + ' px-1.5 py-0.5 rounded">' + (at.geofenceStatus || at.branch || 'Verified') + '</span>';
-
-              aHtml += '<div class="flex justify-between items-center p-2.5 bg-slate-50 border border-slate-200 rounded-xl mb-2">' +
-                '<div class="flex items-center space-x-2.5">' +
-                  selfieImg +
-                  '<div>' +
-                    '<div class="flex items-center gap-1">' +
-                      '<span class="font-bold text-slate-900 text-xs">' + (at.user || 'User') + '</span>' +
-                      geoBadge +
-                    '</div>' +
-                    '<p class="text-[10px] text-slate-500 mt-0.5">' + (at.date || '') + ' • ' + (at.time || '') + '</p>' +
-                  '</div>' +
-                '</div>' +
-                '<div class="flex items-center gap-1.5">' +
-                  '<span class="text-[10px] font-bold ' + (at.type === 'Check-In' ? 'text-emerald-700 bg-emerald-100' : 'text-rose-700 bg-rose-100') + ' px-2 py-0.5 rounded-full">' + at.type + '</span>' +
-                  mapBtn +
-                '</div>' +
-              '</div>';
-            }
-            ownerAttEl.innerHTML = aHtml;
-          }
-        }
-      } catch(e) {}
-
-      // Sales History Feed (Clickable for Detail View)
-      try {
-        var ownerSalesEl = document.getElementById('ownerAllSalesFeed');
-        if (ownerSalesEl) {
-          if (billedSales.length === 0) {
-            ownerSalesEl.innerHTML = '<p class="text-slate-400 text-center py-2">कोई स्वीकृत बिल नहीं</p>';
-          } else {
-            var bHtml = '';
-            for (var b = 0; b < billedSales.length; b++) {
-              var bs = billedSales[b];
-              bHtml += '<div onclick="showDetailedSaleReport(\'' + bs.id + '\')" class="flex justify-between items-center p-3 bg-slate-50 hover:bg-blue-50/70 border border-slate-200 rounded-xl mb-2 cursor-pointer transition">' +
-                '<div>' +
-                  '<div class="flex items-center gap-1.5">' +
-                    '<p class="font-black text-slate-900 text-xs">' + (bs.category || 'सामान') + '</p>' +
-                    '<span class="text-[10px] bg-blue-100 text-blue-900 font-bold px-1.5 py-0.2 rounded">' + (bs.qty || 1) + ' Pc</span>' +
-                    '<span class="text-[9px] bg-slate-200 text-slate-700 font-semibold px-1.5 py-0.2 rounded">' + (bs.branch || '') + '</span>' +
-                  '</div>' +
-                  '<p class="text-[10px] text-slate-500 mt-0.5">👤 ' + (bs.staff || '-') + ' • 📅 ' + (bs.date || '-') + ' • ⏰ ' + (bs.billedTime || bs.sentTime || '-') + '</p>' +
-                '</div>' +
-                '<div class="text-right">' +
-                  '<p class="font-black text-blue-950 text-xs">₹' + (bs.amount || 0).toLocaleString() + '</p>' +
-                  '<span class="text-[9px] bg-emerald-100 text-emerald-800 font-black px-1.5 py-0.5 rounded block mt-0.5">+₹' + (bs.commission || 0) + '</span>' +
-                '</div>' +
-              '</div>';
-            }
-            ownerSalesEl.innerHTML = bHtml;
           }
         }
       } catch(e) {}
@@ -1572,28 +1663,6 @@
       renderLocalData();
     }
 
-    function saveNewBranch() {
-      var name = document.getElementById('branchNewName').value.trim();
-      var lat = parseFloat(document.getElementById('branchLat').value) || 0;
-      var lng = parseFloat(document.getElementById('branchLng').value) || 0;
-
-      if (!name) return;
-      var branches = LocalDB.getBranches();
-      var existing = branches.find(function(b) { return b.name.toLowerCase() === name.toLowerCase(); });
-      if (existing) {
-        existing.lat = lat;
-        existing.lng = lng;
-      } else {
-        branches.push({ name: name, lat: lat, lng: lng, radius: 150 });
-      }
-
-      LocalDB.setBranches(branches);
-      if (db) db.collection("settings").doc("branches").set({ list: branches });
-      document.getElementById('branchNewName').value = '';
-      alert("✓ शोरूम GPS के साथ सेव हुआ!");
-      renderLocalData();
-    }
-
     function changeMasterPIN() {
       var oldPin = prompt("वर्तमान मास्टर पिन दर्ज करें:");
       if (oldPin !== LocalDB.getMasterPin()) { alert("❌ गलत पिन!"); return; }
@@ -1607,6 +1676,7 @@
     function clearAllDataEmergency() {
       if (!confirm("क्या आप वाकई लोकल कैश साफ़ करना चाहते हैं?")) return;
       localStorage.removeItem('shw_sales');
+      localStorage.removeItem('shw_attendance');
       manualSyncFromCloud(function() {
         alert("✓ नया डेटा लोड हुआ!");
       });
